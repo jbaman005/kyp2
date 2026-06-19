@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // ===== GOOGLE DRIVE CONFIGURATION =====
-  // Replace with your OAuth 2.0 Client ID from Google Cloud Console
+  
   const GOOGLE_CLIENT_ID = '15206403545-tlhgpd8r250koqlk00pnbihvjbj4bskl.apps.googleusercontent.com';
   const DRIVE_FOLDER_ID = '1orbLbFd1wemzElvWMd4a6cU2vW7JklBg';
   
@@ -35,25 +34,42 @@ document.addEventListener('DOMContentLoaded', () => {
   let gapi_loaded = false;
 
   const initGoogleAPI = () => {
-    if (gapi_loaded || !window.gapi) return;
-    gapi.load('client:auth2', async () => {
-      try {
-        await gapi.client.init({
-          clientId: GOOGLE_CLIENT_ID,
-          scope: 'https://www.googleapis.com/auth/drive.readonly',
-          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+    if (gapi_loaded) return;
+    
+    // Wait for gapi to be available
+    const checkGapi = setInterval(() => {
+      if (window.gapi) {
+        clearInterval(checkGapi);
+        gapi.load('client:auth2', async () => {
+          try {
+            await gapi.client.init({
+              clientId: GOOGLE_CLIENT_ID,
+              scope: 'https://www.googleapis.com/auth/drive.readonly',
+              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            });
+            gapi_loaded = true;
+            updateAuthStatus();
+            if (googleDriveBtn) {
+              googleDriveBtn.disabled = false;
+              googleDriveBtn.style.opacity = '1';
+              googleDriveBtn.title = 'Load photos from Google Drive';
+            }
+            console.log('Google Drive API initialized successfully');
+          } catch (error) {
+            console.error('Failed to initialize Google API:', error);
+            if (authStatusEl) authStatusEl.textContent = 'Error loading Google Drive';
+          }
         });
-        gapi_loaded = true;
-        updateAuthStatus();
-        if (googleDriveBtn) {
-          googleDriveBtn.disabled = false;
-          googleDriveBtn.style.opacity = '1';
-        }
-      } catch (error) {
-        console.error('Failed to initialize Google API:', error);
-        authStatusEl.textContent = 'Error loading Google Drive';
       }
-    });
+    }, 100);
+    
+    // Timeout after 10 seconds
+    setTimeout(() => {
+      clearInterval(checkGapi);
+      if (!gapi_loaded && authStatusEl) {
+        authStatusEl.textContent = 'Failed to load Google API';
+      }
+    }, 10000);
   };
 
   const updateAuthStatus = () => {
@@ -120,24 +136,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (googleDriveBtn) {
     googleDriveBtn.addEventListener('click', async () => {
       if (!gapi_loaded) {
-        authStatusEl.textContent = 'Initializing...';
-        // Wait a bit for API to load
-        setTimeout(() => {
-          if (!gapi_loaded) {
-            authStatusEl.textContent = 'Set up Client ID first';
-            return;
-          }
-          authenticateGoogle();
-        }, 500);
-      } else {
-        authenticateGoogle();
+        if (authStatusEl) authStatusEl.textContent = 'API still loading...';
+        return;
       }
+      authenticateGoogle();
     });
     
-    // Disable button initially with hint
+    // Button disabled until API is ready
     googleDriveBtn.disabled = true;
     googleDriveBtn.style.opacity = '0.6';
-    googleDriveBtn.title = 'Set GOOGLE_CLIENT_ID in script.js first';
+    googleDriveBtn.title = 'Initializing Google Drive...';
   }
 
   const loadSavedPhotos = () => {
@@ -288,8 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initialize Google API
-  if (GOOGLE_CLIENT_ID !== 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com') {
+  // Initialize Google API automatically
+  if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com') {
     initGoogleAPI();
+  } else if (authStatusEl) {
+    authStatusEl.textContent = 'Client ID not configured';
   }
 });
