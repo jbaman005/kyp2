@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kinno Surprise</title>
   <link rel="stylesheet" href="styles.css" />
+  <script async defer src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
   <div class="bg-hearts">
@@ -84,10 +85,14 @@
             <h2>Photo gallery</h2>
           </div>
           <div class="gallery-controls">
-            <label class="upload-label">
-              Upload photos
-              <input id="photo-upload-input" type="file" accept="image/*" multiple />
-            </label>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+              <label class="upload-label">
+                Upload photos
+                <input id="photo-upload-input" type="file" accept="image/*" multiple />
+              </label>
+              <button id="google-drive-btn" class="button button-outline">Load from Google Drive</button>
+              <span id="google-auth-status" style="font-size: 0.9rem; color: #999;"></span>
+            </div>
             <p class="upload-note">Photos are stored locally in your browser and remain here after refresh.</p>
           </div>
           <div class="gallery-grid">
@@ -125,31 +130,31 @@
             <div class="reasons-card">
               <ol>
                 <li>Your laugh lights my day.</li>
-                <li>How you always care first.</li>
+                <li>How you always care so much.</li>
                 <li>Your quiet strength.</li>
                 <li>The way you listen deeply.</li>
                 <li>Your warm and gentle eyes.</li>
                 <li>How safe I feel with you.</li>
-                <li>Your kindness in every moment.</li>
-                <li>How you make simple things special.</li>
-                <li>Your soft sense of humor.</li>
+                <li>Your kindness in the littlest things</li>
+                <li>How you make simple dates feel special.</li>
+                <li>Your sense of humor.</li>
                 <li>How you make me better.</li>
                 <li>Your thoughtful messages.</li>
-                <li>The way you support my dreams.</li>
+                <li>The way you support me fully always.</li>
                 <li>Your adventurous spirit.</li>
-                <li>How you surprise me with love.</li>
-                <li>Our shared quiet evenings.</li>
-                <li>Your honest heart.</li>
+                <li>How you love to surprise me.</li>
+                <li>Our nights we share together playing games.</li>
+                <li>Your honest heart and soul.</li>
                 <li>How you remember the little things.</li>
                 <li>Your bright smile.</li>
                 <li>How you make me feel seen.</li>
                 <li>Your tender encouragement.</li>
                 <li>How you love so fully.</li>
-                <li>The way you hold my hand.</li>
+                <li>The way you hold me close and tight.</li>
                 <li>Your gentle patience.</li>
                 <li>Your creative mind.</li>
                 <li>How you challenge me kindly.</li>
-                <li>Your love for our future.</li>
+                <li>Your dedication to our future.</li>
                 <li>Your thoughtful touches.</li>
                 <li>How you light up every room.</li>
                 <li>Your calming voice.</li>
