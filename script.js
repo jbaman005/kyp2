@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const authStatusEl = document.getElementById('google-auth-status');
   const galleryStorageKey = 'kypGalleryPhotos';
 
+  let accessToken = null;
+
   const renderPhotoItem = (src) => {
     if (!galleryGrid) return;
     const item = document.createElement('div');
@@ -36,27 +38,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const initGoogleAPI = () => {
     if (gapi_loaded) return;
     
-    // Wait for gapi to be available
+    // Wait for both gapi and google.accounts to be available
     const checkGapi = setInterval(() => {
-      if (window.gapi) {
+      if (window.gapi && window.google?.accounts) {
         clearInterval(checkGapi);
-        gapi.load('client:auth2', async () => {
+        
+        // Load the Drive API
+        gapi.load('client', async () => {
           try {
-            await gapi.client.init({
-              clientId: GOOGLE_CLIENT_ID,
-              scope: 'https://www.googleapis.com/auth/drive.readonly',
-              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-            });
+            await gapi.client.load('drive', 'v3');
             gapi_loaded = true;
-            updateAuthStatus();
             if (googleDriveBtn) {
               googleDriveBtn.disabled = false;
               googleDriveBtn.style.opacity = '1';
               googleDriveBtn.title = 'Load photos from Google Drive';
             }
-            console.log('Google Drive API initialized successfully');
+            if (authStatusEl) authStatusEl.textContent = 'Ready';
+            console.log('Google Drive API loaded successfully');
           } catch (error) {
-            console.error('Failed to initialize Google API:', error);
+            console.error('Failed to load Google Drive API:', error);
             if (authStatusEl) authStatusEl.textContent = 'Error loading Google Drive';
           }
         });
@@ -67,42 +67,55 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       clearInterval(checkGapi);
       if (!gapi_loaded && authStatusEl) {
-        authStatusEl.textContent = 'Failed to load Google API';
+        authStatusEl.textContent = 'Failed to load API';
       }
     }, 10000);
   };
 
   const updateAuthStatus = () => {
-    if (!window.gapi || !window.gapi.auth2) return;
-    const auth2 = gapi.auth2.getAuthInstance();
-    if (!auth2) return;
-    const isSignedIn = auth2.isSignedIn.get();
-    authStatusEl.textContent = isSignedIn ? '✓ Connected' : 'Not connected';
+    if (!authStatusEl) return;
+    authStatusEl.textContent = accessToken ? '✓ Connected' : 'Not connected';
   };
 
-  const authenticateGoogle = async () => {
-    if (!window.gapi || !window.gapi.auth2) return;
-    const auth2 = gapi.auth2.getAuthInstance();
-    if (!auth2) return;
-    
+  const handleCredentialResponse = async (response) => {
     try {
-      if (!auth2.isSignedIn.get()) {
-        await auth2.signIn();
+      // Get access token using the ID token
+      const result = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + response.credential);
+      
+      // For Drive API, we need to use a different approach - use the ID token's information
+      // and request a fresh access token with proper scopes
+      if (window.google?.accounts?.oauth2) {
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/drive.readonly',
+          callback: async (tokenResponse) => {
+            if (tokenResponse.error) {
+              console.error('Token request failed:', tokenResponse.error);
+              if (authStatusEl) authStatusEl.textContent = 'Authentication failed';
+              return;
+            }
+            accessToken = tokenResponse.access_token;
+            updateAuthStatus();
+            fetchDrivePhotos();
+          },
+        });
+        tokenClient.requestAccessToken();
       }
-      updateAuthStatus();
-      fetchDrivePhotos();
     } catch (error) {
-      console.error('Authentication failed:', error);
-      authStatusEl.textContent = 'Authentication failed';
+      console.error('Authentication error:', error);
+      if (authStatusEl) authStatusEl.textContent = 'Authentication failed';
     }
   };
 
   const fetchDrivePhotos = async () => {
-    if (!window.gapi || !window.gapi.client) return;
+    if (!accessToken || !window.gapi || !window.gapi.client) {
+      if (authStatusEl) authStatusEl.textContent = 'Not authenticated';
+      return;
+    }
     
     try {
-      authStatusEl.textContent = 'Loading photos...';
-      googleDriveBtn.disabled = true;
+      if (authStatusEl) authStatusEl.textContent = 'Loading photos...';
+      if (googleDriveBtn) googleDriveBtn.disabled = true;
 
       // Query for image files in the folder
       const response = await gapi.client.drive.files.list({
@@ -114,7 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const files = response.result.files || [];
       if (files.length === 0) {
-        authStatusEl.textContent = 'No photos found';
+        if (authStatusEl) authStatusEl.textContent = 'No photos found';
+        if (googleDriveBtn) googleDriveBtn.disabled = false;
         return;
       }
 
@@ -124,22 +138,44 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPhotoItem(imageUrl);
       });
 
-      authStatusEl.textContent = `✓ Loaded ${files.length} photo${files.length !== 1 ? 's' : ''}`;
-      googleDriveBtn.disabled = false;
+      if (authStatusEl) authStatusEl.textContent = `✓ Loaded ${files.length} photo${files.length !== 1 ? 's' : ''}`;
+      if (googleDriveBtn) googleDriveBtn.disabled = false;
     } catch (error) {
       console.error('Failed to fetch photos:', error);
-      authStatusEl.textContent = 'Failed to load photos';
-      googleDriveBtn.disabled = false;
+      if (authStatusEl) authStatusEl.textContent = 'Failed to load photos';
+      if (googleDriveBtn) googleDriveBtn.disabled = false;
     }
   };
 
   if (googleDriveBtn) {
     googleDriveBtn.addEventListener('click', async () => {
       if (!gapi_loaded) {
-        if (authStatusEl) authStatusEl.textContent = 'API still loading...';
+        if (authStatusEl) authStatusEl.textContent = 'Initializing...';
         return;
       }
-      authenticateGoogle();
+      
+      if (!accessToken) {
+        // Initialize token client for access token
+        if (window.google?.accounts?.oauth2) {
+          const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/drive.readonly',
+            callback: async (tokenResponse) => {
+              if (tokenResponse.error) {
+                console.error('Token request failed:', tokenResponse.error);
+                if (authStatusEl) authStatusEl.textContent = 'Authentication failed';
+                return;
+              }
+              accessToken = tokenResponse.access_token;
+              updateAuthStatus();
+              fetchDrivePhotos();
+            },
+          });
+          tokenClient.requestAccessToken();
+        }
+      } else {
+        fetchDrivePhotos();
+      }
     });
     
     // Button disabled until API is ready
