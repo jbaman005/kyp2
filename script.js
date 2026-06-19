@@ -70,12 +70,32 @@ document.addEventListener('DOMContentLoaded', () => {
     
     Object.keys(folders).forEach((folderName) => {
       const folderDiv = document.createElement('div');
-      folderDiv.style.cssText = 'padding: 1rem; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; background: linear-gradient(135deg, #f5f5f5, #fff);';
+      folderDiv.style.cssText = 'padding: 1rem; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; background: linear-gradient(135deg, #f5f5f5, #fff); position: relative;';
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerHTML = '🗑️';
+      deleteBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 16px;';
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm(`Delete folder "${folderName}" and all photos inside?`)) {
+          const data = getGalleryData();
+          delete data[folderName];
+          saveGalleryData(data);
+          if (folderSelect.value === folderName) {
+            folderSelect.value = '';
+            galleryGrid.innerHTML = '';
+          }
+          updateFolderSelect();
+          renderFolders();
+        }
+      };
+      
       folderDiv.innerHTML = `
         <div style="font-size: 2rem; margin-bottom: 0.5rem;">📁</div>
         <div style="font-weight: 500; margin-bottom: 0.5rem;">${folderName}</div>
         <div style="font-size: 0.85rem; color: #666;">${folders[folderName].length} photos</div>
       `;
+      folderDiv.appendChild(deleteBtn);
       folderDiv.onclick = () => {
         folderSelect.value = folderName;
         renderGalleryForFolder(folderName);
