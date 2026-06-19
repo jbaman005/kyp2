@@ -21,12 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const getGalleryData = () => {
     const stored = localStorage.getItem(storageKey);
+    if (!stored) return {};
     try {
-      return stored ? JSON.parse(stored) : {};
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
     } catch (error) {
       console.error('Failed to parse gallery data', error);
-      return {};
     }
+    localStorage.removeItem(storageKey);
+    return {};
   };
 
   const saveGalleryData = (data) => {
@@ -137,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (newFolderBtn) {
     newFolderBtn.addEventListener('click', () => {
-      const folderName = prompt('Enter folder name:');
+      const rawName = prompt('Enter folder name:');
+      const folderName = rawName ? rawName.trim() : '';
       if (!folderName) return;
       
       const folders = getGalleryData();
@@ -151,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateFolderSelect();
       renderFolders();
       folderSelect.value = folderName;
+      renderGalleryForFolder(folderName);
     });
   }
 
