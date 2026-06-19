@@ -226,28 +226,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const staticPhotoManifest = {
+    'Challenge with him 𖹭': ['IMG_8019.jpg'],
+    'Davao Date ✿': [],
+    'First Meet ♡': ['IMG_7884.jpg', 'IMG_7904.jpg', 'IMG_7913.jpg', 'IMG_7915.jpg', 'IMG_7921.jpg'],
+    'Panabo Date ❤︎⁠': ['IMG_8015.jpg', 'IMG_8035.jpg', 'IMG_8041.jpg', 'IMG_8047.jpg']
+  };
+
   const loadStaticPhotos = async () => {
     const folders = getGalleryData();
-    
-    try {
-      const response = await fetch('./photos/manifest.json');
-      const manifest = await response.json();
-      
-      const syncedFolders = { ...folders };
-      for (const [folderName, filenames] of Object.entries(manifest)) {
-        const folderPaths = Array.isArray(filenames)
-          ? filenames
-              .filter((filename) => typeof filename === 'string' && filename.trim())
-              .map((filename) =>
-                `./photos/${encodeURIComponent(folderName)}/${encodeURIComponent(filename)}`
-              )
-          : [];
-        syncedFolders[folderName] = Array.from(new Set(folderPaths));
-      }
-      saveGalleryData(syncedFolders);
-    } catch (error) {
-      console.log('Could not load photo manifest:', error);
+    const syncedFolders = { ...folders };
+
+    for (const [folderName, filenames] of Object.entries(staticPhotoManifest)) {
+      const folderPaths = Array.isArray(filenames)
+        ? filenames
+            .filter((filename) => typeof filename === 'string' && filename.trim())
+            .map((filename) =>
+              `./photos/${encodeURIComponent(folderName)}/${encodeURIComponent(filename)}`
+            )
+        : [];
+      syncedFolders[folderName] = Array.from(new Set(folderPaths));
     }
+
+    saveGalleryData(syncedFolders);
   };
 
   const loadGallery = async () => {
