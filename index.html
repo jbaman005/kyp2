@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kinno Surprise</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script async defer src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
   <div class="bg-hearts">
@@ -87,14 +85,23 @@
           </div>
           <div class="gallery-controls">
             <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="folder-select" style="font-weight: 500;">Folder:</label>
+                <select id="folder-select" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                  <option value="">-- Select Folder --</option>
+                </select>
+                <button id="new-folder-btn" class="button button-outline" style="padding: 0.5rem 1rem;">+ New Folder</button>
+              </div>
               <label class="upload-label">
-                Upload photos
+                Upload to folder
                 <input id="photo-upload-input" type="file" accept="image/*" multiple />
               </label>
-              <button id="google-drive-btn" class="button button-outline">Load from Google Drive</button>
-              <span id="google-auth-status" style="font-size: 0.9rem; color: #999;"></span>
             </div>
-            <p class="upload-note">Photos are stored locally in your browser and remain here after refresh.</p>
+            <p class="upload-note">Photos are organized in folders and saved locally.</p>
+          </div>
+          <div id="folder-list" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Folders</h3>
+            <div id="folders-display" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
           </div>
           <div class="gallery-grid">
             <div class="gallery-item" style="background-image: linear-gradient(135deg, #d8c8ff, #c0ecff);">
