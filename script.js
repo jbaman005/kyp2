@@ -185,7 +185,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const loadGallery = () => {
+  const initializeDefaultFolders = () => {
+    const folders = getGalleryData();
+    // Only create default folders if no folders exist yet
+    if (Object.keys(folders).length === 0) {
+      const defaultFolders = {
+        'Challenge with him 𖹭': [],
+        'Davao Date ✿': [],
+        'First Meet ♡': [],
+        'Panabo Date ❤︎⁠': []
+      };
+      saveGalleryData(defaultFolders);
+    }
+  };
+
+  const loadStaticPhotos = async () => {
+    const folders = getGalleryData();
+    
+    try {
+      const response = await fetch('./photos/manifest.json');
+      const manifest = await response.json();
+      
+      for (const [folderName, filenames] of Object.entries(manifest)) {
+        if (folders[folderName] && folders[folderName].length === 0 && filenames.length > 0) {
+          folders[folderName] = filenames.map(filename => 
+            `./photos/${encodeURIComponent(folderName)}/${filename}`
+          );
+        }
+      }
+      saveGalleryData(folders);
+    } catch (error) {
+      console.log('Could not load photo manifest:', error);
+    }
+  };
+
+  const loadGallery = async () => {
+    initializeDefaultFolders();
+    await loadStaticPhotos();
     updateFolderSelect();
     renderFolders();
   };
