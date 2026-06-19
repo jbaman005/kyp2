@@ -233,20 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('./photos/manifest.json');
       const manifest = await response.json();
       
+      const syncedFolders = { ...folders };
       for (const [folderName, filenames] of Object.entries(manifest)) {
-        if (!folders[folderName]) {
-          folders[folderName] = [];
-        }
-        const folderPaths = filenames.map(filename =>
-          `./photos/${encodeURIComponent(folderName)}/${encodeURIComponent(filename)}`
-        );
-        folderPaths.forEach((path) => {
-          if (!folders[folderName].includes(path)) {
-            folders[folderName].push(path);
-          }
-        });
+        const folderPaths = Array.isArray(filenames)
+          ? filenames
+              .filter((filename) => typeof filename === 'string' && filename.trim())
+              .map((filename) =>
+                `./photos/${encodeURIComponent(folderName)}/${encodeURIComponent(filename)}`
+              )
+          : [];
+        syncedFolders[folderName] = Array.from(new Set(folderPaths));
       }
-      saveGalleryData(folders);
+      saveGalleryData(syncedFolders);
     } catch (error) {
       console.log('Could not load photo manifest:', error);
     }
