@@ -19,14 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===== GALLERY FOLDER SYSTEM =====
   
+  const sanitizeGalleryData = (data) => {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      return {};
+    }
+
+    return Object.entries(data).reduce((result, [folderName, photos]) => {
+      if (typeof folderName !== 'string' || !folderName.trim()) return result;
+      if (!Array.isArray(photos)) {
+        result[folderName] = [];
+        return result;
+      }
+      result[folderName] = Array.from(new Set(
+        photos.filter((src) => typeof src === 'string' && src.trim())
+      ));
+      return result;
+    }, {});
+  };
+
   const getGalleryData = () => {
     const stored = localStorage.getItem(storageKey);
     if (!stored) return {};
     try {
       const parsed = JSON.parse(stored);
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        return parsed;
+      const sanitized = sanitizeGalleryData(parsed);
+      if (JSON.stringify(sanitized) !== stored) {
+        saveGalleryData(sanitized);
       }
+      return sanitized;
     } catch (error) {
       console.error('Failed to parse gallery data', error);
     }
@@ -36,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const saveGalleryData = (data) => {
     try {
-      localStorage.setItem(storageKey, JSON.stringify(data));
+      localStorage.setItem(storageKey, JSON.stringify(sanitizeGalleryData(data)));
     } catch (error) {
       console.error('Failed to save gallery data', error);
     }
