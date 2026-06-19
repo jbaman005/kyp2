@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   
-  const GOOGLE_CLIENT_ID = '15206403545-tlhgpd8r250koqlk00pnbihvjbj4bskl.apps.googleusercontent.com';
-  const DRIVE_FOLDER_ID = '1orbLbFd1wemzElvWMd4a6cU2vW7JklBg';
-  
   const surpriseBtn = document.getElementById('surprise-btn');
   const introOverlay = document.getElementById('intro-overlay');
   const loveLetterCard = document.getElementById('love-letter-card');
@@ -15,229 +12,165 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageButtons = document.querySelectorAll('[data-page]');
   const photoUploadInput = document.getElementById('photo-upload-input');
   const galleryGrid = document.querySelector('.gallery-grid');
-  const googleDriveBtn = document.getElementById('google-drive-btn');
-  const authStatusEl = document.getElementById('google-auth-status');
-  const galleryStorageKey = 'kypGalleryPhotos';
+  const folderSelect = document.getElementById('folder-select');
+  const newFolderBtn = document.getElementById('new-folder-btn');
+  const foldersDisplay = document.getElementById('folders-display');
+  const storageKey = 'kypGalleryFolders'; // Format: { folderName: [photo1, photo2, ...] }
 
-  let accessToken = null;
+  // ===== GALLERY FOLDER SYSTEM =====
+  
+  const getGalleryData = () => {
+    const stored = localStorage.getItem(storageKey);
+    try {
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error('Failed to parse gallery data', error);
+      return {};
+    }
+  };
 
-  const renderPhotoItem = (src) => {
+  const saveGalleryData = (data) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save gallery data', error);
+    }
+  };
+
+  const renderPhotoItem = (src, folderId) => {
     if (!galleryGrid) return;
     const item = document.createElement('div');
     item.className = 'gallery-item uploaded';
+    item.dataset.folder = folderId;
     const img = document.createElement('img');
     img.src = src;
-    img.alt = 'Uploaded photo';
+    img.alt = 'Photo';
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-photo-btn';
+    deleteBtn.innerHTML = '✕';
+    deleteBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: none;';
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      const folders = getGalleryData();
+      folders[folderId] = folders[folderId].filter(p => p !== src);
+      saveGalleryData(folders);
+      item.remove();
+    };
+    item.style.position = 'relative';
     item.appendChild(img);
+    item.appendChild(deleteBtn);
+    item.onmouseenter = () => deleteBtn.style.display = 'block';
+    item.onmouseleave = () => deleteBtn.style.display = 'none';
     galleryGrid.appendChild(item);
   };
 
-  // ===== GOOGLE DRIVE API FUNCTIONS =====
-  let gapi_loaded = false;
-
-  const initGoogleAPI = () => {
-    if (gapi_loaded) return;
+  const renderFolders = () => {
+    const folders = getGalleryData();
+    foldersDisplay.innerHTML = '';
     
-    // Wait for both gapi and google.accounts to be available
-    const checkGapi = setInterval(() => {
-      if (window.gapi && window.google?.accounts) {
-        clearInterval(checkGapi);
-        
-        // Load the Drive API
-        gapi.load('client', async () => {
-          try {
-            await gapi.client.load('drive', 'v3');
-            gapi_loaded = true;
-            if (googleDriveBtn) {
-              googleDriveBtn.disabled = false;
-              googleDriveBtn.style.opacity = '1';
-              googleDriveBtn.title = 'Load photos from Google Drive';
-            }
-            if (authStatusEl) authStatusEl.textContent = 'Ready';
-            console.log('Google Drive API loaded successfully');
-          } catch (error) {
-            console.error('Failed to load Google Drive API:', error);
-            if (authStatusEl) authStatusEl.textContent = 'Error loading Google Drive';
-          }
-        });
-      }
-    }, 100);
-    
-    // Timeout after 10 seconds
-    setTimeout(() => {
-      clearInterval(checkGapi);
-      if (!gapi_loaded && authStatusEl) {
-        authStatusEl.textContent = 'Failed to load API';
-      }
-    }, 10000);
+    Object.keys(folders).forEach((folderName) => {
+      const folderDiv = document.createElement('div');
+      folderDiv.style.cssText = 'padding: 1rem; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; background: linear-gradient(135deg, #f5f5f5, #fff);';
+      folderDiv.innerHTML = `
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📁</div>
+        <div style="font-weight: 500; margin-bottom: 0.5rem;">${folderName}</div>
+        <div style="font-size: 0.85rem; color: #666;">${folders[folderName].length} photos</div>
+      `;
+      folderDiv.onclick = () => {
+        folderSelect.value = folderName;
+        renderGalleryForFolder(folderName);
+      };
+      foldersDisplay.appendChild(folderDiv);
+    });
   };
 
-  const updateAuthStatus = () => {
-    if (!authStatusEl) return;
-    authStatusEl.textContent = accessToken ? '✓ Connected' : 'Not connected';
+  const updateFolderSelect = () => {
+    const folders = getGalleryData();
+    const currentValue = folderSelect.value;
+    folderSelect.innerHTML = '<option value="">-- Select Folder --</option>';
+    Object.keys(folders).forEach((folderName) => {
+      const option = document.createElement('option');
+      option.value = folderName;
+      option.textContent = folderName;
+      folderSelect.appendChild(option);
+    });
+    folderSelect.value = currentValue;
   };
 
-  const handleCredentialResponse = async (response) => {
-    try {
-      // Get access token using the ID token
-      const result = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + response.credential);
-      
-      // For Drive API, we need to use a different approach - use the ID token's information
-      // and request a fresh access token with proper scopes
-      if (window.google?.accounts?.oauth2) {
-        const tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: GOOGLE_CLIENT_ID,
-          scope: 'https://www.googleapis.com/auth/drive.readonly',
-          callback: async (tokenResponse) => {
-            if (tokenResponse.error) {
-              console.error('Token request failed:', tokenResponse.error);
-              if (authStatusEl) authStatusEl.textContent = 'Authentication failed';
-              return;
-            }
-            accessToken = tokenResponse.access_token;
-            updateAuthStatus();
-            fetchDrivePhotos();
-          },
-        });
-        tokenClient.requestAccessToken();
-      }
-    } catch (error) {
-      console.error('Authentication error:', error);
-      if (authStatusEl) authStatusEl.textContent = 'Authentication failed';
-    }
-  };
-
-  const fetchDrivePhotos = async () => {
-    if (!accessToken || !window.gapi || !window.gapi.client) {
-      if (authStatusEl) authStatusEl.textContent = 'Not authenticated';
+  const renderGalleryForFolder = (folderName) => {
+    const folders = getGalleryData();
+    if (!folderName || !folders[folderName]) {
+      galleryGrid.innerHTML = '';
       return;
     }
-    
-    try {
-      if (authStatusEl) authStatusEl.textContent = 'Loading photos...';
-      if (googleDriveBtn) googleDriveBtn.disabled = true;
-
-      // Query for image files in the folder
-      const response = await gapi.client.drive.files.list({
-        q: `'${DRIVE_FOLDER_ID}' in parents and mimeType contains 'image/' and trashed=false`,
-        pageSize: 100,
-        fields: 'files(id, name, mimeType, createdTime)',
-        orderBy: 'createdTime desc',
-      });
-
-      const files = response.result.files || [];
-      if (files.length === 0) {
-        if (authStatusEl) authStatusEl.textContent = 'No photos found';
-        if (googleDriveBtn) googleDriveBtn.disabled = false;
-        return;
-      }
-
-      // Add each photo to gallery
-      files.forEach((file) => {
-        const imageUrl = `https://drive.google.com/uc?id=${file.id}&export=view`;
-        renderPhotoItem(imageUrl);
-      });
-
-      if (authStatusEl) authStatusEl.textContent = `✓ Loaded ${files.length} photo${files.length !== 1 ? 's' : ''}`;
-      if (googleDriveBtn) googleDriveBtn.disabled = false;
-    } catch (error) {
-      console.error('Failed to fetch photos:', error);
-      if (authStatusEl) authStatusEl.textContent = 'Failed to load photos';
-      if (googleDriveBtn) googleDriveBtn.disabled = false;
-    }
+    galleryGrid.innerHTML = '';
+    folders[folderName].forEach((src) => {
+      renderPhotoItem(src, folderName);
+    });
   };
 
-  if (googleDriveBtn) {
-    googleDriveBtn.addEventListener('click', async () => {
-      if (!gapi_loaded) {
-        if (authStatusEl) authStatusEl.textContent = 'Initializing...';
+  if (folderSelect) {
+    folderSelect.addEventListener('change', (e) => {
+      renderGalleryForFolder(e.target.value);
+    });
+  }
+
+  if (newFolderBtn) {
+    newFolderBtn.addEventListener('click', () => {
+      const folderName = prompt('Enter folder name:');
+      if (!folderName) return;
+      
+      const folders = getGalleryData();
+      if (folders[folderName]) {
+        alert('Folder already exists!');
         return;
       }
       
-      if (!accessToken) {
-        // Initialize token client for access token
-        if (window.google?.accounts?.oauth2) {
-          const tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: 'https://www.googleapis.com/auth/drive.readonly',
-            callback: async (tokenResponse) => {
-              if (tokenResponse.error) {
-                console.error('Token request failed:', tokenResponse.error);
-                if (authStatusEl) authStatusEl.textContent = 'Authentication failed';
-                return;
-              }
-              accessToken = tokenResponse.access_token;
-              updateAuthStatus();
-              fetchDrivePhotos();
-            },
-          });
-          tokenClient.requestAccessToken();
-        }
-      } else {
-        fetchDrivePhotos();
-      }
+      folders[folderName] = [];
+      saveGalleryData(folders);
+      updateFolderSelect();
+      renderFolders();
+      folderSelect.value = folderName;
     });
-    
-    // Button disabled until API is ready
-    googleDriveBtn.disabled = true;
-    googleDriveBtn.style.opacity = '0.6';
-    googleDriveBtn.title = 'Initializing Google Drive...';
   }
-
-  const loadSavedPhotos = () => {
-    if (!galleryGrid) return;
-    const stored = localStorage.getItem(galleryStorageKey);
-    if (!stored) return;
-    try {
-      const photos = JSON.parse(stored);
-      if (Array.isArray(photos)) {
-        photos.forEach((src) => {
-          renderPhotoItem(src);
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load saved photos', error);
-    }
-  };
-
-  const savePhotos = (photos) => {
-    try {
-      localStorage.setItem(galleryStorageKey, JSON.stringify(photos));
-    } catch (error) {
-      console.error('Failed to save photos', error);
-    }
-  };
-
-  const getSavedPhotos = () => {
-    const stored = localStorage.getItem(galleryStorageKey);
-    try {
-      const photos = stored ? JSON.parse(stored) : [];
-      return Array.isArray(photos) ? photos : [];
-    } catch (error) {
-      return [];
-    }
-  };
 
   if (photoUploadInput) {
     photoUploadInput.addEventListener('change', (event) => {
+      const selectedFolder = folderSelect.value;
+      if (!selectedFolder) {
+        alert('Please select or create a folder first!');
+        return;
+      }
+
       const files = Array.from(event.target.files || []);
       if (!files.length) return;
-      const savedPhotos = getSavedPhotos();
+
+      const folders = getGalleryData();
+      if (!folders[selectedFolder]) {
+        folders[selectedFolder] = [];
+      }
+
       files.forEach((file) => {
         const reader = new FileReader();
         reader.onload = () => {
           const src = reader.result;
-          savedPhotos.push(src);
-          savePhotos(savedPhotos);
-          renderPhotoItem(src);
+          folders[selectedFolder].push(src);
+          saveGalleryData(folders);
+          renderPhotoItem(src, selectedFolder);
         };
         reader.readAsDataURL(file);
       });
+      
       photoUploadInput.value = '';
     });
   }
 
-  loadSavedPhotos();
+  const loadGallery = () => {
+    updateFolderSelect();
+    renderFolders();
+  };
+
+  loadGallery();
 
   const showPage = (pageId) => {
     document.querySelectorAll('.page').forEach((page) => {
@@ -330,12 +263,5 @@ document.addEventListener('DOMContentLoaded', () => {
     introReturn.addEventListener('click', () => {
       location.reload();
     });
-  }
-
-  // Initialize Google API automatically
-  if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com') {
-    initGoogleAPI();
-  } else if (authStatusEl) {
-    authStatusEl.textContent = 'Client ID not configured';
   }
 });
