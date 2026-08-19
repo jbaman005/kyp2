@@ -12,9 +12,31 @@ document.addEventListener('DOMContentLoaded', () => {
       closing: 'Always yours,',
       signature: 'James'
     },
+    {
+      month: '2026-07',
+      title: 'July 2026',
+      greeting: 'To the love of my life,',
+      paragraphs: [
+        'I want to start this letter by thanking you for your endless patience. The distance between us is something I think about every single day, and I know how much it hurts, because it hurt for me too. Yet you still continued to love me truthfully, adoringly, and always so amazingly. You have given me nothing but kindness despite the kilometers that separate us, and for that, I am so, so, so grateful.',
+        'There will always be a part of me wishing I could give you more, wishing I could hold your hand whenever you needed me, or be there in person to celebrate your good days and comfort you through the exhausting ones. There was always a sinking feeling in my chest because it had been so long since I had seen my gorgeous and handsome boyfriend. To see your striking features would have meant the whole world to me. The guilt of not being able to give you what you deserve sometimes overwhelms me, yet you always remind me that you love me despite it all. You remind me, without ever saying it, that your love for me is unconditional.',
+        'I know waiting for the day we can finally be together in person takes strength. I see that strength in you every single day, in the way you show up for me despite the distance, in the way you never let this hardship diminish what we have. Thank you for believing in us when it would be so easy to give up. For now, know that even though I cannot hold you, my heart is always with you, and my dreams are always of the moment we stop counting the days and start counting our forever.'
+      ],
+      closing: 'Always yours, always waiting,',
+      signature: 'James'
+    },
+    {
+      month: '2026-08',
+      title: 'August 2026',
+      greeting: 'To the love of my life,',
+      paragraphs: [
+        'It\'s been about two weeks since I moved to Davao, and these past few weeks with you in Davao have been nothing short of magic. All the time we spent apart was worth it since I got to see you so many times, and ever since I moved here, I really got to experience the thrill of being with you in person that phone calls and text messages could never quite capture. I find myself wondering how I ever lived without seeing your smile every single day, without being able to reach over and hold your hand whenever I want. You have completely changed my point of view in life, Kinno, and I am so deeply grateful.',
+        'Thank you for spending so much time with me. Thank you for every moment we share, from the quiet mornings to the late nights filled with laughter. I\'m so glad that the hardest part is over, and thank you so much, my love, for investing so much of yourself into building this beautiful thing we have.',
+        'My heart is so full of love for you, Kinno. Not just because of the distance we have overcome, but because of who you are, how you love, and the life we are building together. The hardest part is over, and now we get to enjoy the sweetest reward: each other, any time we want. I love you more than words could ever express.'
+      ],
+      closing: 'Always yours,',
+      signature: 'James'
+    },
     ...[
-      ['2026-07', 'July 2026'],
-      ['2026-08', 'August 2026'],
       ['2026-09', 'September 2026'],
       ['2026-10', 'October 2026'],
       ['2026-11', 'November 2026'],
