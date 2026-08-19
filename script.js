@@ -118,7 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedLetter = monthlyLetters.find((letter) => letter.month === letterMonthSelect.value);
       if (selectedLetter) renderLetter(selectedLetter);
     });
-    selectYear('2027');
+    // Start at July 2026
+    const julyLetter = monthlyLetters.find((letter) => letter.month === '2026-07');
+    if (julyLetter) {
+      selectYear('2026');
+      letterMonthSelect.value = '2026-07';
+      renderLetter(julyLetter);
+    } else {
+      selectYear('2027');
+    }
   }
 
   const surpriseBtn = document.getElementById('surprise-btn');
