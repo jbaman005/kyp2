@@ -3,9 +3,9 @@
   --surface: rgba(255, 255, 255, 0.94);
   --text: #2b2141;
   --muted: #8b7fa6;
-  --primary: #b39dff; 
-  --primary-soft: #e9e0ff; 
-  --accent: #cfeeff; 
+  --primary: #b39dff; /* soft lavender */
+  --primary-soft: #e9e0ff; /* very light lavender */
+  --accent: #cfeeff; /* light blue */
   --border: rgba(179, 157, 255, 0.12);
   --shadow: 0 28px 56px rgba(140, 110, 230, 0.06);
 }
@@ -19,7 +19,7 @@
 }
 
 @font-face {
-  
+  /* Elegant Typewriter: regular and italic */
 }
 
 @font-face {
@@ -96,10 +96,10 @@ img {
 }
 
 .brand .bunny-sticker {
-  height: 4.32em; 
+  height: 4.32em; /* 50% larger than 2.88em */
   width: auto;
-  max-height: 225px; 
-  max-width: none; 
+  max-height: 225px; /* allow larger display */
+  max-width: none; /* override global img max-width */
   object-fit: contain;
   display: inline-block;
   vertical-align: middle;
@@ -449,7 +449,7 @@ img {
   transition: transform 0.25s ease, text-shadow 0.25s ease;
 }
 
-
+/* Allow the 100 Reasons button to grow for larger icon */
 .intro-actions button[data-page="reasons"] {
   width: auto;
   height: auto;
@@ -595,7 +595,7 @@ img {
   50% { transform: translateY(-24px) scale(1.08); opacity: 1; }
 }
 
-
+/* Background heart layer */
 .bg-hearts {
   position: fixed;
   inset: 0;
@@ -620,7 +620,7 @@ img {
   100% { transform: translateY(30px) rotate(-6deg); opacity: 0.75; }
 }
 
-
+/* positions and variety */
 .bg-hearts .bg-heart:nth-child(1)  { left: 6%;  top: 78%;  font-size: 1.8rem;  animation-duration: 9s;  animation-delay: 0s; }
 .bg-hearts .bg-heart:nth-child(2)  { left: 18%; top: 64%;  font-size: 1.4rem;  animation-duration: 11s; animation-delay: 1.2s; }
 .bg-hearts .bg-heart:nth-child(3)  { left: 32%; top: 88%;  font-size: 2.4rem;  animation-duration: 12s; animation-delay: 0.6s; }
@@ -650,13 +650,13 @@ img {
 .bg-hearts .bg-heart:nth-child(27) { left: 92%; top: 60%;  font-size: 1.5rem;  animation-duration: 11.9s; animation-delay: 1.5s; }
 .bg-hearts .bg-heart:nth-child(28) { left: 50%; top: 50%;  font-size: 3.0rem;  animation-duration: 15s;  animation-delay: 0s; }
 
-
+/* Make the love-letter page background light blue (override .section-dark for this page) */
 #page-love-letter .section-dark {
   background: linear-gradient(180deg, #d7e8f5 0%, #c5ddf0 100%);
   color: var(--text);
 }
 
-
+/* Cute decoration above the letter */
 .letter-decoration {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -675,7 +675,7 @@ img {
   50% { transform: translateY(-8px); opacity: 1; }
 }
 
-
+/* Spotify embed styling */
 .spotify-embed {
   margin-top: 1rem;
   border-radius: 12px;
@@ -695,13 +695,13 @@ img {
   .spotify-embed iframe { height: 300px; }
 }
 
-
+/* Spotify open button (cute, centered, light green) */
 .spotify-open {
   display: inline-block;
   margin: 1rem auto 0;
   background: linear-gradient(180deg, #49d36a 0%, #1db954 100%);
   color: #ffffff;
-  text-decoration: none; 
+  text-decoration: none; /* remove underline */
   padding: 0.7rem 1.25rem;
   border-radius: 999px;
   font-weight: 700;
@@ -713,7 +713,7 @@ img {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 18px 36px rgba(29,185,84,0.22);
 }
-
+/* heart emoji removed from button prefix */
 
 @media (max-width: 420px) {
   .spotify-open { padding: 0.6rem 1rem; font-size: 0.95rem; }
@@ -889,6 +889,45 @@ img {
   z-index: 2;
 }
 
+.letter-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.letter-years {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.letter-year-button,
+.letter-month-select {
+  border: 1px solid rgba(123, 108, 255, 0.28);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  background: #fff;
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.letter-month-select {
+  cursor: pointer;
+}
+
+.letter-year-button.active,
+.letter-year-button:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.letter-month-label {
+  margin-left: 0.5rem;
+  color: var(--muted);
+}
+
 .letter-header h1.letter-title {
   margin: 0;
   position: relative;
@@ -900,7 +939,16 @@ img {
   line-height: 1.05;
 }
 
+.letter-header h2.letter-title {
+  margin: 0 0 1.5rem;
+  color: #2b2141;
+  font-family: 'Elegant Typewriter', serif;
+  font-style: italic;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 1.05;
+}
 
+/* Greeting inside the letter: larger than paragraph, smaller than previous heading */
 .letter-greeting {
   margin: 0 0 0.8rem;
   font-family: 'Elegant Typewriter', serif;
@@ -966,4 +1014,3 @@ img {
   .gallery-grid { grid-template-columns: 1fr; }
   .reasons-card { max-height: none; }
 }
-
