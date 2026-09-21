@@ -36,8 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
       closing: 'Always yours,',
       signature: 'James'
     },
+    {
+      month: '2026-09',
+      title: 'September 2026 - Our 3rd Monthsary',
+      greeting: 'To the love of my life,',
+      paragraphs: [
+        'When I first met you, I thought nothing much of it. At first glance, you were just some cute guy who swiped right on me and chatted first. But somehow, I had a feeling that you were different, not like the others I had been swiping through on the app. Sure, you barely chatted at first, but something inside me felt like you were the one, and I\'m so glad I was right.',
+        'From the very first chats we had, I could tell that you were special. You were thoughtful, kind, sweet, and caring, everything I\'ve been looking for in a man, all in one beautiful and gorgeous body. Seriously, you truly do have a face for modeling with the right training.',
+        'You are the most beautiful man I have ever met. Your eyes shine a glow that could spark a flame in the darkest of nights. Your smile could cheer me up anytime, and you truly do have the lips of an angel, and they make me feel as if you\'re the home I\'ve always wanted to return to. Every day with your beauty is a reminder to myself that I am the luckiest man on Earth.',
+        'You\'ve truly made me the happiest I\'ve ever been, but that isn\'t to say it\'s been smooth sailing these past few months. If anything, it\'s been the opposite. But all the time and effort you give, every affirmation you make, and all the love and attention you so often pour out to me have been so, so worth it. For the past few months, I\'ve been struggling with my mental, financial, and physical health, but you make me feel like I\'m on top of the world, and I\'m so grateful for that. Now that I have an allowance, I\'m super thrilled to finally be able to do the same for you and make you feel how happy you\'ve made me.',
+        'I also want you to know that I love the little things about us - the random chats in the middle of the day, the way you always give time to update me even when you\'re busy, and how even the most boring days feel lighter when I get to share it with you. I never thought I\'d find someone who makes me feel this safe, but you do, every single day.',
+        'There\'s a quiet kind of sweetness I\'ve come to treasure in you, too. The way you give your 100% whenever may special day tayo, the way your voice softens when I\'ve had a hard day, the way you make me laugh even when I\'m trying to stay upset with you. You have this gentle way of making ordinary moments feel like something worth keeping, and I hold onto every one of them.',
+        'I promise to keep showing up for you, to listen when you need someone to talk to, and to be as patient with you as you\'ve been with me. I know I\'m not perfect, hon, and I still have a lot to work on, but I\'ll always try my best for us. Without a doubt, you are the one I want to spend my life with. You\'re the shoulder I cry on during tough days and the one I want to celebrate my wins with, and yours too if you\'ll let me.',
+        'The man of my dreams, the love of my life, I really, really, really love you, with all my heart and all my soul. You take up a whole lot of space in my mind, my heart, and my soul, if not all of it. I\'m so glad I got to spend these last three months with you, and may the tides turn in our favor so we get to spend a lifetime together, if not the next one too.',
+        'You are everything to me, hon. You are the cosmos, the sun, my universe. You fill me with endless joy and happiness, and I will forever be overjoyed that I get to be yours.'
+      ],
+      closing: 'Always yours,',
+      signature: 'James'
+    },
     ...[
-      ['2026-09', 'September 2026'],
       ['2026-10', 'October 2026'],
       ['2026-11', 'November 2026'],
       ['2026-12', 'December 2026'],
