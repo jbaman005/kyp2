@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       month: '2026-09',
-      title: 'September 2026 - Our 3rd Monthsary',
+      title: 'September 2026',
       greeting: 'To the love of my life,',
       paragraphs: [
         'When I first met you, I thought nothing much of it. At first glance, you were just some cute guy who swiped right on me and chatted first. But somehow, I had a feeling that you were different, not like the others I had been swiping through on the app. Sure, you barely chatted at first, but something inside me felt like you were the one, and I\'m so glad I was right.',
