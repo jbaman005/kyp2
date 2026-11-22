@@ -75,8 +75,24 @@ document.addEventListener('DOMContentLoaded', () => {
       closing: 'Always yours,',
       signature: 'James'
     },
+        {
+      month: '2026-11',
+      title: 'November 2026',
+      greeting: 'To the love of my life,',
+      paragraphs: [
+        "Hon, I don't think I'll ever be able to thank you enough for being there for me, always. Through the good days and the bad ones, you've stayed by my side, and I never have to wonder whether you'll show up. Knowing I have you to lean on makes everything feel a little less heavy, and I hope you know how much that means to me.",
+        "I also want to thank you for putting up with my attitude sometimes. I know I can be a handful when I'm tired, stressed, or just in a mood, and you somehow manage to stay patient with me anyway. I hope you know I do the same for you, because I tolerate yours the same way you tolerate mine. That's one of the things I love most about us: neither of us has to be perfect, and we meet each other with patience instead of keeping score.",
+        "I love how we match each other's humor and vibes, and that we can laugh about the small stuff while recognizing when to be serious. We can be silly one minute and laughing, then completely serious the next, talking about real things and what's on our hearts. Not everyone gets to have both in one person, and I'm so grateful that I do. You're my favorite person to joke around with, and also the one I trust most when things get real.",
+        "Of course, we're not perfect, and we do argue sometimes. But I love that we never let it drag on. We talk it out, we figure it out, and we finish our arguments as soon as we can, because neither of us wants to go to bed upset with the other. Choosing communication over silence and understanding over pride is what keeps us strong, and I'm proud of us for that.",
+        "I love that we make each other better without ever trying to change each other. You've taught me to be patient, to see the good and bad in every situation, and to be softer with myself when I'm being too hard on myself. Because of you, I've grown in ways I never expected, and I hope I've given you even a little of the same encouragement you've given me. We cheer for each other's wins, we hold each other up after the losses, and I never feel like I have to face anything alone.",
+        "I also love the little things, hon, like the way we can sit in comfortable quiet and still feel close, the jokes we tell to each other that can always make each other laugh, and the small ways you show you care without needing to say a word. Those moments might seem tiny, but they're the ones I treasure most. They remind me that love isn't only in the big gestures. It's in the everyday choices, the patience, the laughter, and the way we keep showing up for each other, again and again.",
+        "More than anything, hon, I love that we love each other through thick and thin. On the easy days and the hard ones, when we're together and when we're apart, I never doubt where we stand. You're my comfort, my happiness, and my safe place, and I feel so lucky to call you mine.",
+        "Thank you for being you, hon, for being patient with me, for making me laugh, and for loving me through everything. In every universe, I'd like to think that I'd choose you every single time. Here's to us, to growing together, and to all the beautiful years ahead. I love you forever and always, babe. : )"
+      ],
+      closing: 'Always yours,',
+      signature: 'James'
+    },
     ...[
-      ['2026-11', 'November 2026'],
       ['2026-12', 'December 2026'],
       ['2027-01', 'January 2027'],
       ['2027-02', 'February 2027'],
